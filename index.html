@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Embed Google Script</title>
+</head>
+<body>
+  <div id="app">Đang tải nội dung từ Google Apps Script...</div>
+
+  <script>
+    (async () => {
+      const url = "https://script.google.com/macros/s/AKfycbyc8LcO9qOLPRv3sg-YKmC4SdvMhQNq5rrylRqgliAPJk7BzMTmNAw2fyVJN7g-9Kvs/exec";
+      try {
+        const res = await fetch(url);
+        const html = await res.text();
+        document.getElementById("app").innerHTML = html;
+      } catch (e) {
+        document.getElementById("app").innerText = "Không thể tải nội dung.";
+      }
+    })();
+  </script>
+</body>
+</html>
