@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Test GSS</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <iframe 
+    id="webappFrame"
+    src=""
+    allowfullscreen
+  ></iframe>
+
+  <script>
+    // Lấy page_slug từ URL hoặc dùng giá trị mặc định
+    const pathname = window.location.pathname;
+    let pageSlug = pathname && pathname !== '/' 
+      ? pathname.replace(/^\//, '') // Loại bỏ dấu / đầu tiên
+      : 'nenanh'; // Giá trị mặc định
+    
+    // Nếu page_slug là index.html thì dùng giá trị mặc định
+    if (pageSlug === 'index.html') {
+      pageSlug = 'nenanh';
+    }
+    
+    // Lấy dữ liệu từ API
+    const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbz72ncs3lWsH4RQIShu8Bah9z6-Q9WyHNN56_Jr5Ftxeq26s4IwNa2p--c6VS5BmkiaXQ/exec';
+    const apiUrl = `${apiBaseUrl}?page_slug=${encodeURIComponent(pageSlug)}`;
+    
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.data && result.data['WebApp Link']) {
+          const iframe = document.getElementById('webappFrame');
+          iframe.src = result.data['WebApp Link'];
+        } else {
+          console.error('Không tìm thấy WebApp Link trong response');
+        }
+      })
+      .catch(error => {
+        console.error('Lỗi khi lấy dữ liệu:', error);
+      });
+  </script>
+</body>
+</html>
+
