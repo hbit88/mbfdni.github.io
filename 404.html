@@ -14,9 +14,48 @@
       width: 100%;
       height: 100vh;
     }
+    
+    /* Loading overlay */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    
+    #loadingOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    /* Spinner */
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+  
   <iframe 
     id="webappFrame"
     src=""
@@ -37,20 +76,44 @@
     
     // Lấy dữ liệu từ API
     const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbz72ncs3lWsH4RQIShu8Bah9z6-Q9WyHNN56_Jr5Ftxeq26s4IwNa2p--c6VS5BmkiaXQ/exec';
-    const apiUrl = `${apiBaseUrl}?page_slug=${encodeURIComponent(pageSlug)}`;
+    const apiUrl = `${apiBaseUrl}?page=${encodeURIComponent(pageSlug)}`;
+    
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const iframe = document.getElementById('webappFrame');
+    
+    // Hàm ẩn loading
+    function hideLoading() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
     
     fetch(apiUrl)
       .then(response => response.json())
       .then(result => {
         if (result.success && result.data && result.data['WebApp Link']) {
-          const iframe = document.getElementById('webappFrame');
           iframe.src = result.data['WebApp Link'];
+          
+          // Ẩn loading khi iframe đã load xong
+          iframe.onload = function() {
+            hideLoading();
+          };
+          
+          // Ẩn loading sau 5 giây nếu iframe không load được
+          setTimeout(() => {
+            if (loadingOverlay.style.display !== 'none') {
+              hideLoading();
+            }
+          }, 5000);
         } else {
           console.error('Không tìm thấy WebApp Link trong response');
+          hideLoading();
         }
       })
       .catch(error => {
         console.error('Lỗi khi lấy dữ liệu:', error);
+        hideLoading();
       });
   </script>
 </body>
