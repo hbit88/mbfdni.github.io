@@ -63,14 +63,23 @@
   ></iframe>
 
   <script>
-    // Lấy page_slug từ URL hoặc dùng giá trị mặc định
+    // Lấy page từ query parameter hoặc pathname, hoặc dùng giá trị mặc định
+    const urlParams = new URLSearchParams(window.location.search);
     const pathname = window.location.pathname;
-    let pageSlug = pathname && pathname !== '/' 
-      ? pathname.replace(/^\//, '') // Loại bỏ dấu / đầu tiên
-      : 'nenanh'; // Giá trị mặc định
+    
+    let pageSlug = 'nenanh'; // Giá trị mặc định
+    
+    // Ưu tiên lấy từ query parameter ?page=
+    if (urlParams.has('page')) {
+      pageSlug = urlParams.get('page');
+    } 
+    // Nếu không có query parameter, lấy từ pathname
+    else if (pathname && pathname !== '/') {
+      pageSlug = pathname.replace(/^\//, ''); // Loại bỏ dấu / đầu tiên
+    }
     
     // Nếu page_slug là index.html thì dùng giá trị mặc định
-    if (pageSlug === 'index.html') {
+    if (pageSlug === 'index.html' || !pageSlug) {
       pageSlug = 'nenanh';
     }
     
